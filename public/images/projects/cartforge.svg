@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" role="img" aria-label="cartforge interface preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E0C0A"/><stop offset="1" stop-color="#17130F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.75" cy="0.1" r="0.85">
+      <stop offset="0" stop-color="#C9A961" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#C9A961" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#glow)"/>
+  <rect x="72" y="110" width="1056" height="540" rx="16" fill="#0F0D0B" stroke="#241F1A"/><circle cx="112" cy="168" r="7" fill="#3FBF8F"/><rect x="136" y="161" width="520" height="14" rx="7" fill="#241F1A"/><rect x="680" y="162" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="222" r="7" fill="#3FBF8F"/><rect x="136" y="215" width="660" height="14" rx="7" fill="#241F1A"/><rect x="820" y="216" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="276" r="7" fill="#3FBF8F"/><rect x="136" y="269" width="430" height="14" rx="7" fill="#241F1A"/><rect x="590" y="270" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="330" r="7" fill="#3FBF8F"/><rect x="136" y="323" width="710" height="14" rx="7" fill="#241F1A"/><rect x="870" y="324" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="384" r="7" fill="#3FBF8F"/><rect x="136" y="377" width="380" height="14" rx="7" fill="#241F1A"/><rect x="540" y="378" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="438" r="7" fill="#C9A961"/><rect x="136" y="431" width="600" height="14" rx="7" fill="#241F1A"/><rect x="760" y="432" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="492" r="7" fill="#3FBF8F"/><rect x="136" y="485" width="480" height="14" rx="7" fill="#241F1A"/><rect x="640" y="486" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="546" r="7" fill="#3FBF8F"/><rect x="136" y="539" width="740" height="14" rx="7" fill="#241F1A"/><rect x="900" y="540" width="46" height="12" rx="6" fill="#1C1813"/><circle cx="112" cy="600" r="7" fill="#3FBF8F"/><rect x="136" y="593" width="350" height="14" rx="7" fill="#241F1A"/><rect x="510" y="594" width="46" height="12" rx="6" fill="#1C1813"/><rect x="836" y="524" width="252" height="86" rx="14" fill="#15120F" stroke="#C9A961" stroke-opacity="0.35"/><rect x="864" y="550" width="150" height="14" rx="7" fill="#C9A961" opacity="0.85"/><rect x="864" y="576" width="96" height="10" rx="5" fill="#2F2820"/>
+  <text x="1128" y="716" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="15" letter-spacing="4" fill="#4A453E">MAHSA HASSANI</text>
+</svg>

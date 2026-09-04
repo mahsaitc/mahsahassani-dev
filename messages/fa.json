@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "about": "درباره",
+    "skills": "مهارت‌ها",
+    "work": "نمونه‌کار",
+    "journey": "مسیر",
+    "writing": "نوشته‌ها",
+    "contact": "تماس",
+    "resume": "رزومه",
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو",
+    "switchLanguage": "تغییر زبان",
+    "primaryNav": "اصلی"
+  },
+  "hero": {
+    "skipToContent": "رفتن به محتوا",
+    "viewWork": "دیدن نمونه‌کارها",
+    "startConversation": "شروع گفتگو",
+    "stats": {
+      "repositories": "مخزن عمومی",
+      "testsPassing": "تست موفق",
+      "cleanArchitecture": "Clean Architecture"
+    }
+  },
+  "about": {
+    "eyebrow": "درباره",
+    "badges": {
+      "engineering": "مهندسی کامپیوتر — طراحی نرم‌افزار",
+      "medicine": "پیشینه پزشکی عمومی",
+      "automation": "اتوماسیون و هوش مصنوعی کاربردی"
+    },
+    "currently": "هم‌اکنون",
+    "getInTouch": "در تماس باشید"
+  },
+  "skills": {
+    "eyebrow": "توانمندی‌ها",
+    "proficiency": "میزان تسلط بر {name}"
+  },
+  "projects": {
+    "eyebrow": "نمونه‌کارهای منتخب",
+    "sort": "مرتب‌سازی",
+    "sortFeatured": "منتخب",
+    "sortNewest": "جدیدترین",
+    "sortName": "الفبا",
+    "filterAll": "همه",
+    "filterLabel": "فیلتر پروژه‌ها بر اساس فناوری",
+    "noMatches": "هنوز چیزی با این فیلتر مطابقت ندارد.",
+    "viewSource": "مشاهده سورس",
+    "liveDemo": "نسخه نمایشی",
+    "caseStudy": "مطالعه موردی",
+    "readNext": "مورد بعدی",
+    "allWork": "همه نمونه‌کارها",
+    "repository": "مخزن",
+    "stack": "پشته فناوری",
+    "role": "نقش",
+    "featured": "منتخب",
+    "hoverForDemo": "برای نمایش نگه دارید",
+    "playDemo": "پخش نمایش پروژه"
+  },
+  "timeline": {
+    "eyebrow": "مسیر"
+  },
+  "testimonials": {
+    "eyebrow": "نظرها"
+  },
+  "writing": {
+    "eyebrow": "نوشته‌ها",
+    "allPosts": "همه نوشته‌ها",
+    "minRead": "{minutes} دقیقه مطالعه",
+    "min": "{minutes} دقیقه",
+    "backToWriting": "همه نوشته‌ها",
+    "noPosts": "هنوز نوشته‌ای منتشر نشده است."
+  },
+  "contact": {
+    "eyebrow": "تماس",
+    "email": "ایمیل",
+    "phone": "تلفن",
+    "basedIn": "محل سکونت",
+    "downloadResume": "دریافت رزومه",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "form": {
+      "name": "نام شما",
+      "namePlaceholder": "نام و نام خانوادگی",
+      "email": "ایمیل",
+      "emailPlaceholder": "you@example.com",
+      "message": "پیام",
+      "messagePlaceholder": "چه چیزی می‌سازید؟",
+      "send": "ارسال پیام",
+      "sending": "در حال ارسال...",
+      "success": "ممنون — پیام شما ارسال شد.",
+      "error": "ارسال نشد. دوباره تلاش کنید یا مستقیم ایمیل بزنید.",
+      "required": "این فیلد الزامی است.",
+      "invalidEmail": "یک ایمیل معتبر وارد کنید.",
+      "tooShort": "لطفاً کمی بیشتر بنویسید."
+    }
+  },
+  "footer": {
+    "navigate": "پیمایش",
+    "elsewhere": "جاهای دیگر",
+    "status": "وضعیت",
+    "rightsReserved": "تمام حقوق محفوظ است.",
+    "builtWith": "ساخته‌شده با"
+  },
+  "notFound": {
+    "title": "صفحه پیدا نشد",
+    "body": "این صفحه وجود ندارد یا جابه‌جا شده است.",
+    "home": "بازگشت به خانه"
+  }
+}

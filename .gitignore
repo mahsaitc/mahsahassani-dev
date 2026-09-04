@@ -1,0 +1,55 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+.env
+.env.*
+!.env.example
+!*/.env.example
+
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+.remember/
+
+# Playwright MCP scratch output
+.playwright-mcp/
+*.playwright.png
+
+# CMS runtime state — never commit the database or uploaded files
+backend/**/bin/
+backend/**/obj/
+backend/**/*.db
+backend/**/*.db-shm
+backend/**/*.db-wal
+backend/**/uploads/
+
+# Isolated production build target (npm run build:isolated)
+.next-build/
+
+# Databases, anywhere in the tree. The backend rules below are narrower; these
+# catch a stray dev database at any path.
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Personal media, not source. The resume PDF and any uploaded demo clips or
+# images are Mahsa's own files; the CMS serves them from disk at runtime and
+# they are re-uploaded per environment rather than committed.
+public/mahsa-hassani-resume.pdf
+public/media/*
+!public/media/README.md
+
+# Throwaway verification drivers written during development.
+_*.mjs
+_*.py

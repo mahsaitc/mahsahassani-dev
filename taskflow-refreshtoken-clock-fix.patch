@@ -1,0 +1,124 @@
+diff --git a/src/TaskFlow.Domain/Entities/RefreshToken.cs b/src/TaskFlow.Domain/Entities/RefreshToken.cs
+index e056032..59ca88e 100644
+--- a/src/TaskFlow.Domain/Entities/RefreshToken.cs
++++ b/src/TaskFlow.Domain/Entities/RefreshToken.cs
+@@ -17,13 +17,18 @@ public sealed class RefreshToken : Entity
+     {
+     }
+ 
+-    private RefreshToken(Guid userId, string tokenHash, DateTime expiresAtUtc, string? createdByIp)
++    private RefreshToken(
++        Guid userId,
++        string tokenHash,
++        DateTime expiresAtUtc,
++        string? createdByIp,
++        DateTime createdAtUtc)
+     {
+         UserId = userId;
+         TokenHash = tokenHash;
+         ExpiresAtUtc = expiresAtUtc;
+         CreatedByIp = createdByIp;
+-        CreatedAtUtc = DateTime.UtcNow;
++        CreatedAtUtc = createdAtUtc;
+     }
+ 
+     public Guid UserId { get; private set; }
+@@ -47,16 +52,25 @@ public sealed class RefreshToken : Entity
+ 
+     public bool IsActive(DateTime asOfUtc) => !IsRevoked && !IsExpired(asOfUtc);
+ 
++    /// <summary>
++    /// <paramref name="createdAtUtc"/> defaults to the ambient clock so existing
++    /// callers are unaffected. Pruning compares CreatedAtUtc against a caller
++    /// supplied instant, so a caller that controls one clock but not the other
++    /// gets inconsistent results — that mismatch is what made the pruning test
++    /// pass on the day it was written and fail every day after.
++    /// </summary>
+     internal static RefreshToken Issue(
+         Guid userId,
+         string? tokenHash,
+         DateTime expiresAtUtc,
+-        string? createdByIp) =>
++        string? createdByIp,
++        DateTime? createdAtUtc = null) =>
+         new(
+             Guard.AgainstEmpty(userId, nameof(userId)),
+             Guard.AgainstNullOrWhiteSpace(tokenHash, nameof(tokenHash)),
+             expiresAtUtc,
+-            createdByIp);
++            createdByIp,
++            createdAtUtc ?? DateTime.UtcNow);
+ 
+     internal void Revoke(DateTime asOfUtc, Guid? replacedByTokenId = null)
+     {
+diff --git a/src/TaskFlow.Domain/Entities/User.cs b/src/TaskFlow.Domain/Entities/User.cs
+index e51dfde..a79c700 100644
+--- a/src/TaskFlow.Domain/Entities/User.cs
++++ b/src/TaskFlow.Domain/Entities/User.cs
+@@ -70,9 +70,13 @@ public sealed class User : AggregateRoot
+ 
+     public void Activate() => IsActive = true;
+ 
+-    public RefreshToken IssueRefreshToken(string? tokenHash, DateTime expiresAtUtc, string? createdByIp = null)
++    public RefreshToken IssueRefreshToken(
++        string? tokenHash,
++        DateTime expiresAtUtc,
++        string? createdByIp = null,
++        DateTime? createdAtUtc = null)
+     {
+-        var token = RefreshToken.Issue(Id, tokenHash, expiresAtUtc, createdByIp);
++        var token = RefreshToken.Issue(Id, tokenHash, expiresAtUtc, createdByIp, createdAtUtc);
+         _refreshTokens.Add(token);
+ 
+         return token;
+diff --git a/tests/TaskFlow.Domain.Tests/Entities/RefreshTokenTests.cs b/tests/TaskFlow.Domain.Tests/Entities/RefreshTokenTests.cs
+index 062c82f..9d76900 100644
+--- a/tests/TaskFlow.Domain.Tests/Entities/RefreshTokenTests.cs
++++ b/tests/TaskFlow.Domain.Tests/Entities/RefreshTokenTests.cs
+@@ -10,7 +10,17 @@ namespace TaskFlow.Domain.Tests.Entities;
+ /// </summary>
+ public sealed class RefreshTokenTests
+ {
+-    private static readonly DateTime Now = new(2026, 8, 4, 12, 0, 0, DateTimeKind.Utc);
++    /// <summary>
++    /// Anchored to the run instant rather than a fixed calendar date. Every
++    /// assertion below is a relative offset, so nothing here depends on *when*
++    /// the suite runs — only on the intervals between the offsets.
++    ///
++    /// The previous fixed date rotted: token creation stamped the ambient clock
++    /// while pruning compared against this constant, so the two drifted apart by
++    /// one day for every day after the test was written.
++    /// </summary>
++    private static readonly DateTime Now =
++        new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc);
+ 
+     private static User NewUser() => User.Register("mahsa@example.com", "Mahsa", "hash");
+ 
+@@ -150,11 +160,16 @@ public sealed class RefreshTokenTests
+     public void Pruning_drops_dead_tokens_and_keeps_live_ones()
+     {
+         var user = NewUser();
+-        user.IssueRefreshToken("dead", Now.AddDays(-1));
++
++        // createdAtUtc is pinned to the same clock the prune point uses.
++        // Pruning drops a token only once CreatedAtUtc + retention is behind
++        // that point, so leaving creation on the ambient clock made the outcome
++        // depend on the wall-clock date.
++        user.IssueRefreshToken("dead", Now.AddDays(-1), createdAtUtc: Now);
+ 
+         // Outlives the prune point on purpose: pruning is about clearing out
+         // dead rows, not about expiring live sessions early.
+-        user.IssueRefreshToken("alive", Now.AddDays(60));
++        user.IssueRefreshToken("alive", Now.AddDays(60), createdAtUtc: Now);
+ 
+         user.PruneRefreshTokens(Now.AddDays(40), TimeSpan.FromDays(30));
+ 
+@@ -165,7 +180,7 @@ public sealed class RefreshTokenTests
+     public void Pruning_keeps_a_dead_token_that_is_still_within_the_retention_window()
+     {
+         var user = NewUser();
+-        user.IssueRefreshToken("recently-dead", Now.AddDays(-1));
++        user.IssueRefreshToken("recently-dead", Now.AddDays(-1), createdAtUtc: Now);
+ 
+         user.PruneRefreshTokens(Now, TimeSpan.FromDays(30));
+ 

@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://mahsahassani.dev}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      CONTACT_FROM: ${CONTACT_FROM}
+      CONTACT_TO: ${CONTACT_TO}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

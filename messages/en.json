@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "about": "About",
+    "skills": "Skills",
+    "work": "Work",
+    "journey": "Journey",
+    "writing": "Writing",
+    "contact": "Contact",
+    "resume": "Résumé",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "switchLanguage": "Switch language",
+    "primaryNav": "Primary"
+  },
+  "hero": {
+    "skipToContent": "Skip to content",
+    "viewWork": "View selected work",
+    "startConversation": "Start a conversation",
+    "stats": {
+      "repositories": "Public repositories",
+      "testsPassing": "Tests passing",
+      "cleanArchitecture": "Clean Architecture"
+    }
+  },
+  "about": {
+    "eyebrow": "About",
+    "badges": {
+      "engineering": "Computer Engineering — Software Design",
+      "medicine": "General Medicine background",
+      "automation": "Automation & applied AI"
+    },
+    "currently": "Currently",
+    "getInTouch": "Get in touch"
+  },
+  "skills": {
+    "eyebrow": "Capabilities",
+    "proficiency": "{name} proficiency"
+  },
+  "projects": {
+    "eyebrow": "Selected work",
+    "sort": "Sort",
+    "sortFeatured": "Featured",
+    "sortNewest": "Newest",
+    "sortName": "A–Z",
+    "filterAll": "All",
+    "filterLabel": "Filter projects by technology",
+    "noMatches": "Nothing matches that filter yet.",
+    "viewSource": "View source",
+    "liveDemo": "Live demo",
+    "caseStudy": "Case study",
+    "readNext": "Read next",
+    "allWork": "All work",
+    "repository": "Repository",
+    "stack": "Stack",
+    "role": "Role",
+    "featured": "Featured",
+    "hoverForDemo": "Hover for demo",
+    "playDemo": "Play project demo"
+  },
+  "timeline": {
+    "eyebrow": "Journey"
+  },
+  "testimonials": {
+    "eyebrow": "Words"
+  },
+  "writing": {
+    "eyebrow": "Writing",
+    "allPosts": "All posts",
+    "minRead": "{minutes} min read",
+    "min": "{minutes} min",
+    "backToWriting": "All writing",
+    "noPosts": "No posts yet."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "basedIn": "Based in",
+    "downloadResume": "Download résumé",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "form": {
+      "name": "Your name",
+      "namePlaceholder": "Jane Smith",
+      "email": "Email",
+      "emailPlaceholder": "jane@example.com",
+      "message": "Message",
+      "messagePlaceholder": "What are you building?",
+      "send": "Send message",
+      "sending": "Sending...",
+      "success": "Thanks — your message is on its way.",
+      "error": "That did not send. Try again, or email me directly.",
+      "required": "This field is required.",
+      "invalidEmail": "Enter a valid email address.",
+      "tooShort": "Please write a little more."
+    }
+  },
+  "footer": {
+    "navigate": "Navigate",
+    "elsewhere": "Elsewhere",
+    "status": "Status",
+    "rightsReserved": "All rights reserved.",
+    "builtWith": "Built with"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "That page does not exist, or it moved.",
+    "home": "Back home"
+  }
+}
