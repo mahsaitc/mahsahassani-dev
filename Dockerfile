@@ -10,6 +10,19 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build-time origins. NEXT_PUBLIC_* values are inlined into the client and
+# server bundles (site URL feeds sitemap/robots/metadata), and next.config.mjs derives images.remotePatterns from both — the
+# standalone server freezes that config at build. A different value per
+# environment therefore needs its own image build; changing the runtime env
+# alone is not enough. API_BASE_URL is also read at runtime (compose sets it).
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG API_BASE_URL
+ARG NEXT_PUBLIC_SITE_URL=https://mahsahassani.dev
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL} \
+    API_BASE_URL=${API_BASE_URL} \
+    NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+
 RUN npm run build
 
 FROM node:22-alpine AS runner

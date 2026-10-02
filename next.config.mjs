@@ -20,6 +20,45 @@ const isStatic = process.env.NEXT_OUTPUT === 'export';
  */
 const distDir = process.env.NEXT_DIST_DIR || '.next';
 
+/**
+ * Uploads are served by the ASP.NET API under `/uploads` (Storage:PublicPrefix),
+ * so next/image must trust the API origin — localhost:5099 in dev, the real API
+ * host in production. Both variables are read: the admin builds upload URLs
+ * from NEXT_PUBLIC_API_BASE_URL, the public pages (lib/api.ts mediaUrl) from
+ * API_BASE_URL, and the two can differ behind Docker. Next loads .env* before
+ * evaluating this file, so .env.local is already applied here.
+ *
+ * Unset is allowed (static export, or a build without the CMS); a malformed
+ * value fails the build instead of silently breaking every uploaded image.
+ */
+function apiUploadsPatterns() {
+  const patterns = new Map();
+
+  for (const name of ['NEXT_PUBLIC_API_BASE_URL', 'API_BASE_URL']) {
+    const raw = process.env[name]?.trim();
+    if (!raw) continue;
+
+    let url;
+    try {
+      url = new URL(raw);
+    } catch {
+      throw new Error(`${name} is not a valid URL: "${raw}"`);
+    }
+
+    // Keep any sub-path the API is mounted under (e.g. https://example.com/api).
+    const basePath = url.pathname.replace(/\/+$/, '');
+    const pattern = {
+      protocol: url.protocol.replace(/:$/, ''),
+      hostname: url.hostname,
+      port: url.port,
+      pathname: `${basePath}/uploads/**`,
+    };
+    patterns.set(JSON.stringify(pattern), pattern);
+  }
+
+  return [...patterns.values()];
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -40,6 +79,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: 'opengraph.githubassets.com' },
+      ...apiUploadsPatterns(),
     ],
   },
   /**

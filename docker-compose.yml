@@ -1,11 +1,19 @@
 services:
   web:
-    build: .
+    build:
+      context: .
+      # Baked in at build time (client bundle + images.remotePatterns).
+      # Changing these requires `docker compose build`, not just a restart.
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        API_BASE_URL: ${API_BASE_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://mahsahassani.dev}
     restart: unless-stopped
     ports:
       - '3000:3000'
     environment:
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://mahsahassani.dev}
+      # Server-side fetches and the admin proxy read this at runtime too.
+      API_BASE_URL: ${API_BASE_URL}
       RESEND_API_KEY: ${RESEND_API_KEY}
       CONTACT_FROM: ${CONTACT_FROM}
       CONTACT_TO: ${CONTACT_TO}
