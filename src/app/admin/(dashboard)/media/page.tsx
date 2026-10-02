@@ -129,7 +129,6 @@ export default function MediaPage() {
             {items.map((asset) => (
               <li key={asset.id} className="overflow-hidden rounded-md border border-border">
                 {asset.kind === 'Image' ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={assetUrl(asset.publicPath)} alt="" className="aspect-video w-full object-cover" />
                 ) : asset.kind === 'Video' ? (
                   <video src={assetUrl(asset.publicPath)} className="aspect-video w-full bg-black object-cover" muted preload="metadata" />

@@ -74,7 +74,6 @@ export function MediaPicker({
         {value ? (
           <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-border bg-black/30 px-2.5 py-2">
             {kind === 'Image' ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={assetUrl(value)} alt="" className="size-8 shrink-0 rounded object-cover" />
             ) : (
               <Badge tone="neutral">{kind}</Badge>
@@ -134,7 +133,6 @@ export function MediaPicker({
                     className="w-full rounded border border-border p-1 text-left hover:border-gold/50"
                   >
                     {asset.kind === 'Image' ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={assetUrl(asset.publicPath)} alt="" className="aspect-video w-full rounded object-cover" />
                     ) : (
                       <div className="flex aspect-video items-center justify-center rounded bg-black/40 text-[0.65rem] text-muted-foreground">
