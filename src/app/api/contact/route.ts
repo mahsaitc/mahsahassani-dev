@@ -3,11 +3,6 @@ import { Resend } from 'resend';
 import { contactSchema } from '@/lib/validation';
 import { site } from '@/lib/site';
 
-/**
- * Named `route.api.ts` on purpose: `pageExtensions` in next.config.mjs only
- * registers that suffix for server builds, so `npm run build:static` skips this
- * file entirely instead of failing on an unexportable POST handler.
- */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 

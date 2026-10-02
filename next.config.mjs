@@ -82,12 +82,6 @@ const nextConfig = {
       ...apiUploadsPatterns(),
     ],
   },
-  /**
-   * `route.api.ts` is only registered as a route in server builds. The static
-   * export therefore never sees the POST contact handler, which would otherwise
-   * fail the export with "POST is not supported with output: export".
-   */
-  pageExtensions: isStatic ? ['tsx', 'ts'] : ['tsx', 'ts', 'api.ts'],
   eslint: { ignoreDuringBuilds: false },
 };
 

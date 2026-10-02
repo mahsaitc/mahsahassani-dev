@@ -129,12 +129,9 @@ Serves on `:3000`. Put Nginx or Caddy in front for TLS.
 
 ### Static hosting (any CDN, no server)
 
-```bash
-npm run build:static    # -> ./out
-```
-
-`./out` is plain HTML/CSS/JS. The API route is excluded from this build by
-`pageExtensions` in `next.config.mjs`, and the contact form switches to `mailto:`.
+Not available while the admin dashboard is part of the app: its route handlers
+(`/api/admin/*`, `/api/contact`) need a Node server, so `npm run build:static`
+exits with an explanation. Use `npm run build` and one of the targets above.
 
 ### Vercel
 
@@ -144,9 +141,6 @@ Push the repo and import it. Add the environment variables from `.env.example`.
 
 ## Architecture notes
 
-- **`route.api.ts`, not `route.ts`** — `pageExtensions` only registers the `.api.ts`
-  suffix on server builds, so the static export never sees a POST handler it
-  cannot export. One codebase, two deploy targets.
 - **Motion presets are centralised** in `src/lib/motion.ts`. One easing curve and
   one viewport threshold across every section; mixed easings are what make a page
   feel assembled rather than designed.
