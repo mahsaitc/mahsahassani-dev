@@ -29,20 +29,6 @@ public class LocalFileStorage(
         [MediaKind.Document] = "documents",
     };
 
-    /// <summary>
-    /// Magic-number prefixes. A caller can claim any content type, so the first
-    /// bytes are checked too: a file named .png whose header says otherwise is
-    /// rejected regardless of what the multipart headers declared.
-    /// </summary>
-    private static readonly Dictionary<string, byte[][]> Signatures = new()
-    {
-        [".jpg"] = [[0xFF, 0xD8, 0xFF]],
-        [".jpeg"] = [[0xFF, 0xD8, 0xFF]],
-        [".png"] = [[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]],
-        [".gif"] = [[0x47, 0x49, 0x46, 0x38]],
-        [".pdf"] = [[0x25, 0x50, 0x44, 0x46]],
-    };
-
     public async Task<StoredFile> SaveAsync(
         Stream content, string originalFileName, string contentType, MediaKind kind, CancellationToken ct = default)
     {
@@ -207,23 +193,22 @@ public class LocalFileStorage(
         return buffer;
     }
 
+    /// <summary>
+    /// A caller can claim any filename and content type, so the first bytes
+    /// decide: a .webp whose header is an AVIF container is rejected regardless
+    /// of what the multipart headers declared. See <see cref="FileSignatures"/>.
+    /// </summary>
     private static void VerifySignature(Stream content, string extension)
     {
-        if (!Signatures.TryGetValue(extension, out var expected)) return;
-
-        var longest = expected.Max(s => s.Length);
-        var header = new byte[longest];
+        var header = new byte[FileSignatures.HeaderLength];
         content.Position = 0;
-        var read = content.Read(header, 0, longest);
+        var read = content.ReadAtLeast(header, header.Length, throwOnEndOfStream: false);
         content.Position = 0;
 
-        var matches = expected.Any(sig =>
-            read >= sig.Length && header.Take(sig.Length).SequenceEqual(sig));
-
-        if (!matches)
+        var problem = FileSignatures.Validate(header.AsMemory(0, read), extension);
+        if (problem is not null)
         {
-            throw new UploadRejectedException(
-                $"File contents do not match a valid {extension} file.");
+            throw new UploadRejectedException(problem);
         }
     }
 
