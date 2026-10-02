@@ -22,8 +22,9 @@ export async function generateStaticParams() {
   return all.map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { locale: string; slug: string } }): Promise<Metadata> {
-  const post = await loadPost(params.slug, params.locale);
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const post = await loadPost(slug, locale);
   if (!post) return { title: 'Post not found' };
 
   return {
@@ -91,13 +92,14 @@ function BlockView({ block }: { block: Block }) {
   }
 }
 
-export default async function PostPage({ params }: { params: { locale: string; slug: string } }) {
-  const post = await loadPost(params.slug, params.locale);
+export default async function PostPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug } = await params;
+  const post = await loadPost(slug, locale);
   if (!post) notFound();
 
   const t = await getTranslations('writing');
 
-  const all = await loadPosts(params.locale);
+  const all = await loadPosts(locale);
   const index = all.findIndex((p) => p.slug === post.slug);
   const next = all[(index + 1) % all.length];
 
@@ -132,7 +134,7 @@ export default async function PostPage({ params }: { params: { locale: string; s
 
           <div className="mt-8 flex flex-wrap items-center gap-3 text-xs">
             <time dateTime={post.date ?? undefined} className="font-mono uppercase tracking-[0.16em] text-gold">
-              {formatDate(post.date, params.locale)}
+              {formatDate(post.date, locale)}
             </time>
             <span className="inline-flex items-center gap-1.5 text-muted-foreground">
               <Clock className="size-3" />

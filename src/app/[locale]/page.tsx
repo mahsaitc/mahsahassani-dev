@@ -30,8 +30,8 @@ import { Contact } from '@/components/sections/contact';
  */
 export const revalidate = 60;
 
-export default async function HomePage({ params }: { params: { locale: string } }) {
-  const { locale } = params;
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   setRequestLocale(locale);
 
   const [projects, testimonials, skillGroups, marquee, timeline, posts, copy] = await Promise.all([

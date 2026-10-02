@@ -18,8 +18,8 @@ export function generateStaticParams() {
  * hreflang for the locale root. Each page below adds its own alternates for its
  * own path; x-default points at English, which is the site's default locale.
  */
-export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
-  const { locale } = params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
 
   return {
     alternates: {
@@ -72,9 +72,9 @@ export default async function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const { locale } = params;
+  const { locale } = await params;
   if (!routing.locales.includes(locale as Locale)) notFound();
 
   // Required for static rendering of a [locale] segment.

@@ -66,7 +66,7 @@ function CSharpMark({ className }: SvgProps) {
   );
 }
 
-const registry: Record<IconKey, (p: SvgProps) => JSX.Element> = {
+const registry: Record<IconKey, (p: SvgProps) => React.JSX.Element> = {
   dotnet: (p) => <SiDotnet {...p} />,
   csharp: CSharpMark,
   efcore: EfCoreMark,

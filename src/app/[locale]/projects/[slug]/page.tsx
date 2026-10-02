@@ -24,8 +24,9 @@ export async function generateStaticParams() {
   return all.map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { locale: string; slug: string } }): Promise<Metadata> {
-  const project = await loadProject(params.slug, params.locale);
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const project = await loadProject(slug, locale);
   if (!project) return { title: 'Project not found' };
 
   const title = `${project.name} — ${project.tagline}`;
@@ -52,13 +53,14 @@ export async function generateMetadata({ params }: { params: { locale: string; s
   };
 }
 
-export default async function ProjectPage({ params }: { params: { locale: string; slug: string } }) {
-  const project = await loadProject(params.slug, params.locale);
+export default async function ProjectPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug } = await params;
+  const project = await loadProject(slug, locale);
   if (!project) notFound();
 
   const stats = await fetchRepoStats(project.repoName);
 
-  const all = await loadProjects(params.locale);
+  const all = await loadProjects(locale);
   const index = all.findIndex((p) => p.slug === project.slug);
   const next = all[(index + 1) % all.length];
 

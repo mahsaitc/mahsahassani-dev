@@ -22,8 +22,9 @@ export const metadata: Metadata = {
   alternates: { canonical: '/blog' },
 };
 
-export default async function BlogIndexPage({ params }: { params: { locale: string } }) {
-  const sortedPosts = await loadPosts(params.locale);
+export default async function BlogIndexPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const sortedPosts = await loadPosts(locale);
   const t = await getTranslations('writing');
 
   return (
@@ -61,7 +62,7 @@ export default async function BlogIndexPage({ params }: { params: { locale: stri
                     dateTime={post.date ?? undefined}
                     className="font-mono text-xs uppercase tracking-[0.14em] text-gold"
                   >
-                    {formatDate(post.date, params.locale)}
+                    {formatDate(post.date, locale)}
                   </time>
                   <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Clock className="size-3" />
