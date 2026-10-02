@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, Github, Linkedin } from 'lucide-react';
 import { site } from '@/lib/site';
@@ -74,6 +75,8 @@ export function Hero({
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const yTitle = useTransform(scrollYProgress, [0, 1], [0, calm ? 0 : -90]);
   const yGlow = useTransform(scrollYProgress, [0, 1], [0, calm ? 0 : -180]);
+  // Sits between the title and the glow so the three layers separate in depth.
+  const yImage = useTransform(scrollYProgress, [0, 1], [0, calm ? 0 : -130]);
   const yFloor = useTransform(scrollYProgress, [0, 1], [0, calm ? 0 : 60]);
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, calm ? 1 : 0]);
 
@@ -85,6 +88,27 @@ export function Hero({
     >
       <motion.div style={{ y: yGlow }} className="absolute inset-0">
         <Aurora />
+      </motion.div>
+
+      {/*
+        Mobile: full-bleed behind the copy, dimmed so text stays legible.
+        Desktop: confined to the end side behind the stats block; the radial
+        mask dissolves its edges into the dark background instead of showing a frame.
+        In RTL the mask centre and the image mirror, so the fade always faces the
+        copy. The flip lives on <Image> because framer-motion owns this transform.
+      */}
+      <motion.div
+        style={{ y: yImage }}
+        className="pointer-events-none absolute inset-0 opacity-25 md:inset-y-0 md:start-auto md:end-0 md:w-[62%] md:opacity-90 rtl:md:opacity-70 [mask-image:radial-gradient(ellipse_70%_65%_at_62%_48%,#000_30%,transparent_78%)] rtl:[mask-image:radial-gradient(ellipse_70%_65%_at_38%_48%,#000_30%,transparent_78%)]"
+      >
+        <Image
+          src="/images/hero.jpg"
+          alt="Layered glass planes linked by fine gold wireframe lines, lit by a warm glow — an abstract take on layered software architecture"
+          fill
+          priority
+          sizes="(min-width: 768px) 62vw, 100vw"
+          className="object-cover object-[70%_center] rtl:-scale-x-100"
+        />
       </motion.div>
 
       <motion.div style={{ y: yTitle, opacity }} className="container relative z-10">
