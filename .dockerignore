@@ -9,3 +9,11 @@ out
 .playwright-mcp
 *.md
 !README.md
+# The API has its own image (backend/Dockerfile); keep it, and any local
+# database or backup, out of the web build context.
+backend
+*.db
+*.db-shm
+*.db-wal
+*.bak
+img
