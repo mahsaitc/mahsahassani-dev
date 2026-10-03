@@ -1,9 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { getLocale } from 'next-intl/server';
-import { baseFontClass, localeFontClass } from '@/lib/fonts';
-import { isRtl } from '@/i18n/routing';
-import { cn } from '@/lib/utils';
-import { Toaster } from 'sonner';
 import './globals.css';
 import { site } from '@/lib/site';
 
@@ -55,39 +50,11 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/** Person schema so search engines resolve the site to a named professional. */
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  /**
-   * Resolved here rather than in the [locale] segment because dir and lang have
-   * to be on <html>, which only the root layout renders. Admin routes never go
-   * through the locale middleware, so getLocale falls back to the default and
-   * the dashboard stays English and ltr.
-   */
-  const locale = await getLocale().catch(() => 'en');
-  const rtl = isRtl(locale);
-
-  return (
-    <html lang={locale} dir={rtl ? 'rtl' : 'ltr'} className={cn(baseFontClass, localeFontClass(locale))}>
-      <body className="noise relative min-h-screen overflow-x-hidden bg-background">
-        {/*
-          Only document-level concerns live here. The public header, footer,
-          cursor and scroll progress belong to the (site) route group: the
-          header is fixed and z-indexed, so rendering it for every route put it
-          on top of the dashboard's own chrome.
-        */}
-        {children}
-
-        <Toaster
-          theme="dark"
-          position="bottom-right"
-          toastOptions={{
-            classNames: {
-              toast: 'glass !rounded-xl !border-border !text-foreground',
-              description: '!text-muted-foreground',
-            },
-          }}
-        />
-      </body>
-    </html>
-  );
+/**
+ * Pass-through. <html> and <body> are rendered by DocumentShell in the layout
+ * that knows the locale ([locale]/layout, admin/layout, the root not-found), so no
+ * request-dependent locale lookup ever happens here.
+ */
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

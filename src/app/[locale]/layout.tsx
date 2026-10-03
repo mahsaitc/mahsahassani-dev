@@ -9,6 +9,7 @@ import { CustomCursor } from '@/components/fx/cursor';
 import { ScrollProgress } from '@/components/fx/scroll-progress';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
+import { DocumentShell } from '@/components/document-shell';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -83,8 +84,9 @@ export default async function LocaleLayout({
   const [copy, messages] = await Promise.all([loadSiteCopy(locale), getMessages()]);
 
   return (
-    // dir, lang and the locale font live on <html>, set by the root layout.
-    <NextIntlClientProvider messages={messages}>
+    // dir, lang and the locale font come from this segment's own param.
+    <DocumentShell locale={locale}>
+      <NextIntlClientProvider messages={messages}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: toJsonLdScript(buildPersonJsonLd(copy)) }}
@@ -96,7 +98,8 @@ export default async function LocaleLayout({
         <main id="main" className="relative">
           {children}
         </main>
-      <SiteFooter />
-    </NextIntlClientProvider>
+        <SiteFooter />
+      </NextIntlClientProvider>
+    </DocumentShell>
   );
 }

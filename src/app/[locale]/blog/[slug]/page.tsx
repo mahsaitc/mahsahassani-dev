@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowUpRight, Clock } from 'lucide-react';
 import { loadPost, loadPosts, type PostBlock as Block } from '@/lib/content';
 import { site } from '@/lib/site';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Aurora } from '@/components/fx/aurora';
@@ -94,6 +94,10 @@ function BlockView({ block }: { block: Block }) {
 
 export default async function PostPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
+  // Must run before any next-intl server call: without it next-intl reads the
+  // locale from request headers, which fails when this page is rendered on
+  // demand (ISR) and returns a 500 with DYNAMIC_SERVER_USAGE.
+  setRequestLocale(locale);
   const post = await loadPost(slug, locale);
   if (!post) notFound();
 

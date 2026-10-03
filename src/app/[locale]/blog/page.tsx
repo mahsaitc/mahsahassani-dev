@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ArrowUpRight, Clock } from 'lucide-react';
 import { loadPosts } from '@/lib/content';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Reveal, RevealItem } from '@/components/fx/reveal';
@@ -24,6 +24,10 @@ export const metadata: Metadata = {
 
 export default async function BlogIndexPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  // Must run before any next-intl server call: without it next-intl reads the
+  // locale from request headers, which fails when this page is rendered on
+  // demand (ISR) and returns a 500 with DYNAMIC_SERVER_USAGE.
+  setRequestLocale(locale);
   const sortedPosts = await loadPosts(locale);
   const t = await getTranslations('writing');
 

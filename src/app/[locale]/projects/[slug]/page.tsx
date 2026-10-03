@@ -15,6 +15,7 @@ import { Card, CardBody } from '@/components/ui/card';
 import { Reveal, RevealItem } from '@/components/fx/reveal';
 import { Aurora } from '@/components/fx/aurora';
 import { CaseMedia } from '@/components/case-media';
+import { setRequestLocale } from 'next-intl/server';
 
 export const revalidate = 60;
 
@@ -55,6 +56,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function ProjectPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
+  // Keeps on-demand (ISR) renders static-safe once any next-intl server API is used below.
+  setRequestLocale(locale);
   const project = await loadProject(slug, locale);
   if (!project) notFound();
 
