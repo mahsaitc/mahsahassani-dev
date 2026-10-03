@@ -67,6 +67,16 @@ const nextConfig = {
   // 'standalone' emits .next/standalone with a minimal node_modules, which is
   // what the Dockerfile copies into the runner stage.
   output: isStatic ? 'export' : 'standalone',
+  /**
+   * sharp's native binding loads libvips with dlopen, which file tracing cannot
+   * follow, so the standalone output shipped the binding without its library
+   * and next/image silently served originals. Include whichever Linux libvips
+   * build npm installed (musl on the Alpine image, glibc elsewhere); on other
+   * platforms the glob simply matches nothing.
+   */
+  outputFileTracingIncludes: {
+    '/**': ['./node_modules/@img/sharp-libvips-linux*/**/*'],
+  },
   images: {
     // The default loader needs a server; static export must ship raw files.
     unoptimized: isStatic,

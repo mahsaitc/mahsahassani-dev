@@ -4,6 +4,10 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --ignore-scripts
+# npm skips an optional dependency that fails to install without failing the
+# build. If sharp's native libvips is missing, next/image silently serves
+# unoptimised originals, so stop here instead.
+RUN node -e "require('sharp')"
 
 FROM node:22-alpine AS builder
 WORKDIR /app
