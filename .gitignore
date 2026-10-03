@@ -53,3 +53,10 @@ public/media/*
 # Throwaway verification drivers written during development.
 _*.mjs
 _*.py
+
+# Backups (e.g. mahsasite.db.bak, *.pre-*.bak). *.bak also covers *.db.bak.
+*.bak
+*.db.bak
+
+# Raw design source assets. The served copy lives in public/images/.
+img/
