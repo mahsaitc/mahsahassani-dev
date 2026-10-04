@@ -27,24 +27,46 @@ const API_BASE = process.env.API_BASE_URL ?? 'http://localhost:5099';
 /** Seconds before a cached public response is considered stale. */
 const REVALIDATE = Number(process.env.API_REVALIDATE_SECONDS ?? 60);
 
+/**
+ * Static export (npm run build:static). Pages are frozen at build time and
+ * uploads are copied next to them, so media paths stay relative.
+ */
+const isStaticExport = process.env.NEXT_OUTPUT === 'export';
+
+/**
+ * Set by build:static. The degrade-to-empty rule above suits a server that will
+ * re-fetch in a minute; a static export would ship the hollow page until the
+ * next manual deploy, so there every failure must fail the build instead.
+ */
+const strict = process.env.STRICT_API === '1';
+
 async function read<T>(path: string, fallback: T, revalidate = REVALIDATE): Promise<T> {
+  let response: Response;
   try {
-    const response = await fetch(`${API_BASE}/api/${path}`, {
+    response = await fetch(`${API_BASE}/api/${path}`, {
       next: { revalidate, tags: ['content'] },
       headers: { Accept: 'application/json' },
     });
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    if (strict) throw new Error(`[api] ${path} unreachable at ${API_BASE}: ${reason}`);
+    console.warn(`[api] ${path} unreachable:`, reason);
+    return fallback;
+  }
 
-    if (!response.ok) {
-      // 404 is meaningful for single items; the caller's fallback expresses it.
-      if (response.status !== 404) {
-        console.warn(`[api] ${path} responded ${response.status}`);
-      }
-      return fallback;
-    }
+  if (!response.ok) {
+    // 404 is meaningful for single items; the caller's fallback expresses it.
+    if (response.status === 404) return fallback;
+    if (strict) throw new Error(`[api] ${path} responded ${response.status}`);
+    console.warn(`[api] ${path} responded ${response.status}`);
+    return fallback;
+  }
 
+  try {
     return (await response.json()) as T;
   } catch (error) {
-    console.warn(`[api] ${path} unreachable:`, error instanceof Error ? error.message : error);
+    if (strict) throw new Error(`[api] ${path} returned malformed JSON`);
+    console.warn(`[api] ${path} returned malformed JSON:`, error instanceof Error ? error.message : error);
     return fallback;
   }
 }
@@ -84,9 +106,20 @@ export const getCurrentResume = () => read<ApiResumeVersion | null>('resume/curr
 /**
  * Absolute URL for an uploaded file. Stored paths are API-relative, so they
  * need the API origin prepended before a browser can load them.
+ *
+ * The static export is the exception: the API is not deployed with it, so the
+ * path stays relative (/uploads/...) and scripts/postexport.mjs copies each
+ * referenced file into out/uploads. An absolute URL on the API origin is cut
+ * back to its path for the same reason.
  */
 export function mediaUrl(path: string | null | undefined): string | undefined {
   if (!path) return undefined;
+
+  if (isStaticExport) {
+    if (path.startsWith(API_BASE)) return path.slice(API_BASE.length) || undefined;
+    return path;
+  }
+
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
   return `${API_BASE}${path}`;
 }
