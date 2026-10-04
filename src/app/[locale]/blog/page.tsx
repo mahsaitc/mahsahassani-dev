@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { ArrowLeft, ArrowUpRight, Clock } from 'lucide-react';
 import { loadPosts } from '@/lib/content';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -15,12 +15,16 @@ import { Aurora } from '@/components/fx/aurora';
 export const revalidate = 60;
 
 
-export const metadata: Metadata = {
-  title: 'Writing',
-  description:
-    'Short technical essays on architecture, concurrency and realtime systems — from someone who had to get them right in production.',
-  alternates: { canonical: '/blog' },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+
+  return {
+    title: 'Writing',
+    description:
+      'Short technical essays on architecture, concurrency and realtime systems — from someone who had to get them right in production.',
+    alternates: { canonical: `/${locale}/blog` },
+  };
+}
 
 export default async function BlogIndexPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

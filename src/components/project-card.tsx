@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { forwardRef, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Github, Play, Star, GitFork } from 'lucide-react';

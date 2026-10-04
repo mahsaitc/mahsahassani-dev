@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowUpRight, Github, Star, GitFork, CircleDot } from 'lucide-react';
 import { type CaseSection } from '@/data/projects';
@@ -31,13 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (!project) return { title: 'Project not found' };
 
   const title = `${project.name} — ${project.tagline}`;
-  const url = `${site.url}/projects/${project.slug}`;
+  const url = `${site.url}/${locale}/projects/${project.slug}`;
 
   return {
     title,
     description: project.summary,
     keywords: project.tech,
-    alternates: { canonical: `/projects/${project.slug}` },
+    alternates: { canonical: `/${locale}/projects/${project.slug}` },
     openGraph: {
       type: 'article',
       title,

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { Github, Linkedin, Mail, ArrowUpRight } from 'lucide-react';
 import { site, navItems } from '@/lib/site';
 import { loadSiteCopy } from '@/lib/content';

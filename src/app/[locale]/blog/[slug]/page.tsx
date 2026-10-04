@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowUpRight, Clock } from 'lucide-react';
 import { loadPost, loadPosts, type PostBlock as Block } from '@/lib/content';
@@ -31,12 +31,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: post.title,
     description: post.excerpt,
     keywords: post.tags,
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: { canonical: `/${locale}/blog/${post.slug}` },
     openGraph: {
       type: 'article',
       title: post.title,
       description: post.excerpt,
-      url: `${site.url}/blog/${post.slug}`,
+      url: `${site.url}/${locale}/blog/${post.slug}`,
       publishedTime: post.date ?? undefined,
       authors: [site.name],
       tags: post.tags,
@@ -115,7 +115,7 @@ export default async function PostPage({ params }: { params: Promise<{ locale: s
     datePublished: post.date,
     keywords: post.tags.join(', '),
     author: { '@type': 'Person', name: site.name, url: site.url },
-    mainEntityOfPage: `${site.url}/blog/${post.slug}`,
+    mainEntityOfPage: `${site.url}/${locale}/blog/${post.slug}`,
   };
 
   return (

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { ArrowUpRight, Clock } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { SectionHeading } from '@/components/section-heading';
