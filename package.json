@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:static": "echo \"Static export is unavailable while the admin panel is present - see README (Deployment). Use: npm run build\" && exit 1",
+    "build:static": "cross-env NEXT_OUTPUT=export NEXT_PUBLIC_STATIC_EXPORT=true NEXT_PUBLIC_CONTACT_ENDPOINT=/contact.php NEXT_DIST_DIR=.next-static STRICT_API=1 next build && node scripts/postexport.mjs",
     "start": "next start",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",

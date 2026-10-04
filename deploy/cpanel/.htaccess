@@ -1,0 +1,83 @@
+# Apache rules for the static cPanel build (npm run build:static).
+# Copied into out/ by scripts/postexport.mjs; upload it with the rest of out/
+# into public_html. Takes over what src/middleware.dyn.ts does on the server
+# build: locale negotiation for bare paths.
+
+Options -Indexes
+DirectoryIndex index.html
+AddDefaultCharset utf-8
+
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTPS. X-Forwarded-Proto covers hosts that terminate TLS in front of Apache.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # Bare / -> negotiated locale. 302, not 301: the answer depends on the
+  # visitor's Accept-Language, so browsers and proxies must not cache it.
+  RewriteCond %{HTTP:Accept-Language} ^fa [NC]
+  RewriteRule ^$ /fa/ [R=302,L]
+  RewriteRule ^$ /en/ [R=302,L]
+
+  # Locale-less section links (/blog/..., /projects/...) -> negotiated locale,
+  # as the server build's middleware does. Anything else unprefixed 404s.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{HTTP:Accept-Language} ^fa [NC]
+  RewriteRule ^((?:blog|projects)(?:/.*)?)$ /fa/$1 [R=302,L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^((?:blog|projects)(?:/.*)?)$ /en/$1 [R=302,L]
+
+  # Never serve deploy leftovers if they are uploaded by mistake.
+  RewriteRule (^|/)(config(\.sample)?\.php|\.git|\.env) - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # The / redirect varies by language.
+  Header always merge Vary "Accept-Language" "expr=%{REQUEST_URI} == '/'"
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+
+  # Next's static export inlines its bootstrap and RSC payload scripts, so
+  # script-src needs 'unsafe-inline'; framer-motion writes inline styles.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+
+  # Six months, this host only. Raise / add includeSubDomains once every
+  # subdomain is known to serve HTTPS.
+  Header always set Strict-Transport-Security "max-age=15552000" "expr=%{HTTPS} == 'on'"
+
+  # Caching. Hashed build assets never change; HTML must revalidate so a new
+  # deploy is visible at once.
+  <FilesMatch "\.(html|txt|xml)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(png|jpe?g|gif|webp|avif|svg|ico|mp4|webm|pdf)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Must come after the generic image rule above so it wins for /_next/static.
+  <If "%{REQUEST_URI} =~ m#^/_next/static/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType image/avif .avif
+  AddType image/webp .webp
+</IfModule>
