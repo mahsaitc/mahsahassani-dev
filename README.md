@@ -22,7 +22,7 @@ npm run dev                  # http://localhost:3000
 | --- | --- |
 | `npm run dev` | Dev server with HMR |
 | `npm run build` | Production build (`output: standalone`, API routes live) |
-| `npm run build:static` | Fully static export to `./out` (no API routes) |
+| `npm run build:static` | Static export to `./out` for cPanel hosting — see [DEPLOY-CPANEL.md](DEPLOY-CPANEL.md) |
 | `npm start` | Serve the production build |
 | `npm run lint` | ESLint (`next/core-web-vitals`) |
 | `npm run typecheck` | `tsc --noEmit` |
@@ -95,8 +95,10 @@ pretending to succeed. Protections in place: a hidden honeypot field (answered
 `200` so bots learn nothing), 3 requests per minute per IP, and HTML escaping on
 every interpolated value.
 
-In a static export there is no endpoint, so the form falls back to opening the
-visitor's mail client with the message pre-filled.
+The static cPanel build posts to `contact.php` instead, a PHP port with the same
+validation, honeypot and rate limit that sends through `mail()`. A static build
+without `NEXT_PUBLIC_CONTACT_ENDPOINT` falls back to opening the visitor's mail
+client with the message pre-filled.
 
 ## GitHub stats
 
@@ -127,11 +129,12 @@ docker compose up -d --build
 
 Serves on `:3000`. Put Nginx or Caddy in front for TLS.
 
-### Static hosting (any CDN, no server)
+### Static hosting (cPanel / Apache + PHP)
 
-Not available while the admin dashboard is part of the app: its route handlers
-(`/api/admin/*`, `/api/contact`) need a Node server, so `npm run build:static`
-exits with an explanation. Use `npm run build` and one of the targets above.
+`npm run build:static` exports the public site only; the admin dashboard, route
+handlers and middleware are named `*.dyn.tsx` / `*.dyn.ts` and left out of the
+static build. Content is read from the local API at build time. Full steps for
+cPanel shared hosting (Apache + PHP) are in [DEPLOY-CPANEL.md](DEPLOY-CPANEL.md).
 
 ### Vercel
 
