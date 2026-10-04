@@ -113,6 +113,35 @@ curl -H "X-Forwarded-Proto: https" http://127.0.0.1:8090/en/
 
 The image has no sendmail, so a valid contact message returns 502 there.
 
+## Contact form tests
+
+`deploy/cpanel/tests/contact-test.php` posts header-injection attempts (CR/LF,
+bare CR, U+2028, NUL, quote breakout, quoted-local emails), over-length fields,
+an invalid email and a filled honeypot to `contact.php`, captures what `mail()`
+hands to sendmail via `sendmail-capture.php`, and fails on any header line
+other than the expected eight or any Reply-To that is not a single address.
+
+Self-contained, against `deploy/cpanel/contact.php` (no config needed):
+
+```powershell
+docker run --rm -v "${PWD}/deploy/cpanel:/app:ro" php:8.3-cli php /app/tests/contact-test.php
+```
+
+Against Apache with the built `out/`: add these mounts to the preview command
+above, use a `config.php` with `'rate_limit_max' => 1000` (otherwise the 4th
+case gets 429), and put `mkdir -p /tmp/mail && chmod 777 /tmp/mail &&` before
+`apache2-foreground`. `zz-mail.ini` holds one line:
+`sendmail_path = "php /tests/sendmail-capture.php /tmp/mail"`.
+
+```powershell
+  -v "${PWD}/deploy/cpanel/tests:/tests:ro" `
+  -v "${PWD}/zz-mail.ini:/usr/local/etc/php/conf.d/zz-mail.ini:ro" `
+
+docker exec <container> php /tests/contact-test.php --url=http://127.0.0.1/contact.php --capture=/tmp/mail --verbose
+```
+
+Exit code 0 means every case passed.
+
 ## Returning to the Docker / VPS version
 
 Nothing on this branch changes the server build: `npm run build`, `npm run dev`
