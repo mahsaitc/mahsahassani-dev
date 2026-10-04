@@ -104,9 +104,13 @@ if (!is_array($payload)) {
     respond(400, ['error' => 'Malformed request body.']);
 }
 
+// Control characters other than tab/CR/LF have no business in a form field,
+// and mail() throws a ValueError on NUL, which would fatal after a 200.
 $field = function (string $name) use ($payload): string {
     $value = $payload[$name] ?? '';
-    return is_string($value) ? trim($value) : '';
+    return is_string($value)
+        ? trim(preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $value))
+        : '';
 };
 
 $name = $field('name');
@@ -124,7 +128,10 @@ $len = fn (string $s) => mb_strlen($s, 'UTF-8');
 if ($len($name) < 2) $issues['name'][] = 'Please enter your name.';
 elseif ($len($name) > 80) $issues['name'][] = 'String must contain at most 80 character(s)';
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $issues['email'][] = 'That does not look like an email address.';
+// zod's .email() pattern on top of filter_var: filter_var also accepts quoted
+// local parts ("a>,b@c"@d.com), which the Node route rejects.
+$zodEmail = "/^(?!\\.)(?!.*\\.\\.)([A-Z0-9_'+\\-\\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\\-]*\\.)+[A-Z]{2,}$/i";
+if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match($zodEmail, $email)) $issues['email'][] = 'That does not look like an email address.';
 elseif ($len($email) > 160) $issues['email'][] = 'String must contain at most 160 character(s)';
 
 if ($len($subject) < 3) $issues['subject'][] = 'A short subject helps.';
@@ -173,13 +180,18 @@ $body = "From: {$safeName} <{$safeEmail}>\n\n{$message}\n";
 
 // -f sets the envelope sender so SPF is checked against the site's own domain.
 // $from passed FILTER_VALIDATE_EMAIL above, so it cannot smuggle extra flags.
-$sent = @mail(
-    $to,
-    mb_encode_mimeheader('[Portfolio] ' . $safeSubject, 'UTF-8'),
-    $body,
-    $headers,
-    '-f' . $from
-);
+try {
+    $sent = @mail(
+        $to,
+        mb_encode_mimeheader('[Portfolio] ' . $safeSubject, 'UTF-8'),
+        $body,
+        $headers,
+        '-f' . $from
+    );
+} catch (ValueError $e) {
+    error_log('[contact] mail() refused its arguments: ' . $e->getMessage());
+    $sent = false;
+}
 
 if (!$sent) {
     error_log('[contact] mail() returned false');
