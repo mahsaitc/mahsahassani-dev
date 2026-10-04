@@ -62,6 +62,14 @@ for (const file of pageFiles) {
   for (const match of text.matchAll(uploadRef)) referenced.add(match[0]);
 }
 
+// Canonicals, hreflang and the sitemap are built from NEXT_PUBLIC_SITE_URL;
+// .env.local points it at a local server, which must never reach production.
+const sitemap = await fs.readFile(path.join(OUT, 'sitemap.xml'), 'utf8').catch(() => '');
+const localSite = sitemap.match(/<loc>(https?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0)[^<]*)<\/loc>/);
+if (localSite) {
+  fail(`sitemap.xml points at ${localSite[1]}. Rebuild with NEXT_PUBLIC_SITE_URL=https://<your-domain>.`);
+}
+
 if (leaks.length > 0) {
   fail(`${leaks.length} exported file(s) still reference ${API_BASE}:\n  ${leaks.slice(0, 10).join('\n  ')}`);
 }

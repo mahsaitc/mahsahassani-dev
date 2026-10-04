@@ -3,6 +3,12 @@ import { site } from '@/lib/site';
 import { loadPosts, loadProjects } from '@/lib/content';
 import { routing } from '@/i18n/routing';
 
+/**
+ * Same one-minute window the CMS fetches already imply. Stated explicitly
+ * because the static export refuses a metadata route without it.
+ */
+export const revalidate = 60;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Sourced from the CMS so a project or post added from the dashboard is
   // indexed on the next revalidation instead of waiting for a code change.
