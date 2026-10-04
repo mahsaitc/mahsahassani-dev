@@ -9,6 +9,9 @@ import { routing } from '@/i18n/routing';
  */
 export const revalidate = 60;
 
+/** The static build sets trailingSlash, so its canonical URLs end in '/'. */
+const slash = process.env.NEXT_OUTPUT === 'export' ? '/' : '';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Sourced from the CMS so a project or post added from the dashboard is
   // indexed on the next revalidation instead of waiting for a code change.
@@ -22,12 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * need every version to point at every other, not just at the default.
    */
   const alternatesFor = (path: string) => ({
-    languages: Object.fromEntries(locales.map((l) => [l, `${site.url}/${l}${path}`])),
+    languages: Object.fromEntries(locales.map((l) => [l, `${site.url}/${l}${path}${slash}`])),
   });
 
   const localised = (path: string, changeFrequency: 'monthly' | 'weekly' | 'yearly', priority: number, lastModified = now) =>
     locales.map((locale) => ({
-      url: `${site.url}/${locale}${path}`,
+      url: `${site.url}/${locale}${path}${slash}`,
       lastModified,
       changeFrequency,
       priority: locale === defaultLocale ? priority : priority * 0.9,
