@@ -3,10 +3,21 @@ import createNextIntlPlugin from 'next-intl/plugin';
 /**
  * Two build targets share this config:
  *   next build                 -> Node server (VPS / Vercel). API routes live.
- *   NEXT_OUTPUT=export next build -> fully static ./out. API routes are excluded
- *                                    and the contact form degrades to mailto.
+ *   npm run build:static       -> fully static ./out for cPanel shared hosting.
+ *                                 See DEPLOY-CPANEL.md.
  */
 const isStatic = process.env.NEXT_OUTPUT === 'export';
+
+/**
+ * Server-only routes — the admin dashboard, every route handler and the
+ * middleware — are named `*.dyn.tsx` / `*.dyn.ts`. The server build lists those
+ * extensions so Next treats them as ordinary pages; the static build leaves
+ * them out, so Next never sees code that cannot be exported. `page.dyn.tsx`
+ * then resolves to a page named `page.dyn`, which is not a route.
+ */
+const pageExtensions = isStatic
+  ? ['tsx', 'ts', 'jsx', 'js']
+  : ['dyn.tsx', 'dyn.ts', 'tsx', 'ts', 'jsx', 'js'];
 
 /**
  * Build output directory. Defaults to .next so Docker and the VPS are
@@ -64,6 +75,10 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   distDir,
+  pageExtensions,
+  // Static hosting serves /en/blog/index.html for /en/blog/ with no rewrite
+  // rules; the server build keeps its existing slash-less URLs.
+  trailingSlash: isStatic,
   // 'standalone' emits .next/standalone with a minimal node_modules, which is
   // what the Dockerfile copies into the runner stage.
   output: isStatic ? 'export' : 'standalone',
