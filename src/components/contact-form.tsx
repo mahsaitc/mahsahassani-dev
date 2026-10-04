@@ -9,6 +9,14 @@ import { site, isStaticExport } from '@/lib/site';
 import { Button } from '@/components/ui/button';
 import { Input, Textarea, Label, FieldError } from '@/components/ui/input';
 
+/**
+ * Where the form posts. The server build has its own route handler; the static
+ * cPanel build sets NEXT_PUBLIC_CONTACT_ENDPOINT=/contact.php. A static build
+ * without an endpoint has nowhere to post and falls back to mailto.
+ */
+const endpoint =
+  process.env.NEXT_PUBLIC_CONTACT_ENDPOINT || (isStaticExport ? null : '/api/contact');
+
 export function ContactForm() {
   const {
     register,
@@ -25,15 +33,15 @@ export function ContactForm() {
    * Client validation is a courtesy; the server copy is the one that matters.
    */
   const onSubmit = async (values: ContactInput) => {
-    // Static export has no route handler to post to — hand off to the mail client.
-    if (isStaticExport) {
+    // No endpoint to post to — hand off to the mail client.
+    if (!endpoint) {
       const body = encodeURIComponent(`${values.message}\n\n— ${values.name} (${values.email})`);
       window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(values.subject)}&body=${body}`;
       return;
     }
 
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),

@@ -60,3 +60,8 @@ _*.py
 
 # Raw design source assets. The served copy lives in public/images/.
 img/
+
+# Static cPanel build (npm run build:static). out/ is ignored above.
+.next-static/
+# Contact form config with real addresses. Only config.sample.php is committed.
+config.php
