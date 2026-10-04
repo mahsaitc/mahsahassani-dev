@@ -147,13 +147,22 @@ if ($company !== '') {
 /** Header values must never carry CR/LF — that is how header injection works. */
 $oneLine = fn (string $s) => trim(preg_replace('/[\r\n]+/', ' ', $s));
 
-$safeName = str_replace('"', "'", $oneLine($name));
+$safeName = str_replace(['"', '\\'], ["'", ''], $oneLine($name));
 $safeEmail = $oneLine($email);
 $safeSubject = $oneLine($subject);
 
+/**
+ * Display name for an address header. Non-ASCII becomes an RFC 2047 encoded
+ * word; ASCII is quoted so characters like ':' and '@' in a visitor's name
+ * cannot be read as address syntax.
+ */
+$displayName = fn (string $s) => preg_match('/[^\x20-\x7E]/', $s)
+    ? mb_encode_mimeheader($s, 'UTF-8', 'B')
+    : '"' . $s . '"';
+
 $headers = implode("\r\n", [
-    'From: ' . mb_encode_mimeheader($fromName, 'UTF-8') . " <{$from}>",
-    'Reply-To: ' . mb_encode_mimeheader($safeName, 'UTF-8') . " <{$safeEmail}>",
+    'From: ' . $displayName($fromName) . " <{$from}>",
+    'Reply-To: ' . $displayName($safeName) . " <{$safeEmail}>",
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',
     'Content-Transfer-Encoding: 8bit',
